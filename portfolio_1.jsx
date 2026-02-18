@@ -166,6 +166,15 @@ export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("hero");
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState("engineering");
+  const [expandedExp, setExpandedExp] = useState(new Set([0]));
+
+  const toggleExp = (idx) => {
+    setExpandedExp(prev => {
+      const next = new Set(prev);
+      next.has(idx) ? next.delete(idx) : next.add(idx);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -661,53 +670,91 @@ export default function Portfolio() {
           <div style={containerStyle}>
             <h2 style={sectionHeading}>Experience</h2>
             <div>
-              {EXPERIENCES.map((exp, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: "28px 0",
-                    borderTop: idx === 0 ? "none" : `1px solid ${colors.border}`,
-                  }}
-                >
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                    marginBottom: 4,
-                    flexWrap: "wrap",
-                    gap: 8,
-                  }}>
-                    <h3 style={{
-                      fontSize: 17, fontWeight: 600, color: colors.text,
-                      margin: 0,
-                    }}>
-                      {exp.role}
-                    </h3>
-                    {exp.period && (
+              {EXPERIENCES.map((exp, idx) => {
+                const isOpen = expandedExp.has(idx);
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      borderTop: idx === 0 ? "none" : `1px solid ${colors.border}`,
+                    }}
+                  >
+                    <button
+                      onClick={() => toggleExp(idx)}
+                      style={{
+                        width: "100%",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "24px 0",
+                        textAlign: "left",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 16,
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "baseline",
+                          flexWrap: "wrap",
+                          gap: 8,
+                          marginBottom: 4,
+                        }}>
+                          <span style={{
+                            fontSize: 17, fontWeight: 600, color: colors.text,
+                          }}>
+                            {exp.role}
+                          </span>
+                          {exp.period && (
+                            <span style={{
+                              fontSize: 13,
+                              fontFamily: "'JetBrains Mono', monospace",
+                              color: colors.textTertiary,
+                              fontWeight: 400,
+                              flexShrink: 0,
+                            }}>
+                              {exp.period}
+                            </span>
+                          )}
+                        </div>
+                        <span style={{
+                          fontSize: 14, fontWeight: 500, color: colors.accent,
+                        }}>
+                          {exp.company}
+                        </span>
+                      </div>
                       <span style={{
-                        fontSize: 13,
-                        fontFamily: "'JetBrains Mono', monospace",
-                        color: colors.textTertiary,
-                        fontWeight: 400,
+                        fontSize: 18,
+                        color: colors.accent,
+                        flexShrink: 0,
+                        transition: "transform 0.25s",
+                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                        display: "inline-block",
+                        lineHeight: 1,
                       }}>
-                        {exp.period}
+                        ›
                       </span>
-                    )}
+                    </button>
+                    <div style={{
+                      overflow: "hidden",
+                      maxHeight: isOpen ? 400 : 0,
+                      opacity: isOpen ? 1 : 0,
+                      transition: "max-height 0.3s ease, opacity 0.25s ease",
+                    }}>
+                      <p style={{
+                        fontSize: 14, color: colors.textSecondary,
+                        lineHeight: 1.7, paddingBottom: 24,
+                      }}>
+                        {exp.description}
+                      </p>
+                    </div>
                   </div>
-                  <p style={{
-                    fontSize: 14, fontWeight: 500, color: colors.accent,
-                    marginBottom: 8,
-                  }}>
-                    {exp.company}
-                  </p>
-                  <p style={{
-                    fontSize: 14, color: colors.textSecondary,
-                    lineHeight: 1.7,
-                  }}>
-                    {exp.description}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
