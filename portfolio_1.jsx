@@ -120,38 +120,39 @@ const EXPERIENCES = [
   },
 ];
 
-const SKILLS = [
+const TOOLS_AND_FRAMEWORKS = [
+  "Python", "MATLAB", "Simulink", "Git", "SQL", "Excel",
+  "OpenCV", "SolidWorks", "NumPy", "SciPy", "LaTeX",
+];
+
+const DOMAIN_SKILLS = [
   {
-    name: "Scientific Programming & Tooling",
-    description: "I use Python, MATLAB/Simulink, Git, SQL, and Excel daily for scripting, numerical computing, data handling, and research pipelines.",
+    name: "Control Systems & Dynamical Systems",
+    description: "Linear and nonlinear modeling, feedback control design, simulation, Kalman filtering, and stochastic optimal control.",
   },
   {
     name: "Machine Learning & Statistical Modeling",
-    description: "I've trained supervised ML models (k-NN, perceptron, classifiers) and built multimodal fraud/spam detection systems on high-dimensional, imbalanced datasets.",
-  },
-  {
-    name: "Control Systems & Dynamical Systems",
-    description: "I do linear and nonlinear modeling, feedback control design, and simulation. I'm also digging into Kalman filtering and stochastic optimal control.",
+    description: "Supervised ML models (k-NN, perceptron, classifiers), multimodal fraud/spam detection, high-dimensional and imbalanced datasets.",
   },
   {
     name: "Stochastic Processes & SDE Modeling",
-    description: "I build SDE estimators using SINDy and stochastic SINDy, learning drift/diffusion from trajectory data and designing multi-time-step swarm simulations.",
+    description: "SDE estimators using SINDy and stochastic SINDy, drift/diffusion learning from trajectory data, multi-time-step swarm simulations.",
   },
   {
     name: "Signal & Information Processing",
-    description: "I work with experimental signal acquisition, noise handling, and feedback circuits. I like thinking about physics, controls, and ML problems as inference tasks.",
-  },
-  {
-    name: "Experimental Physics & Hardware",
-    description: "I've worked with atomic gravimetry, magneto-optical trap experiments, analog/digital circuit design, and feedback control of lab hardware.",
+    description: "Experimental signal acquisition, noise handling, feedback circuits, FIR/IIR filter design, and inference-based approaches to physics and controls problems.",
   },
   {
     name: "Computer Vision & Data Modalities",
-    description: "I've built OpenCV-based image pipelines with contour extraction, and I'm comfortable working across time-series, text, tabular, sequence, and image data.",
+    description: "Image pipelines with contour extraction, and working across time-series, text, tabular, sequence, and image data.",
+  },
+  {
+    name: "Experimental Physics & Hardware",
+    description: "Atomic gravimetry, magneto-optical trap experiments, analog/digital circuit design, and feedback control of lab hardware.",
   },
   {
     name: "Research, Teaching & Communication",
-    description: "I've done research across multiple labs, contributed to publications/posters, served as a Physics TA and Learning Assistant, and I take documentation seriously.",
+    description: "Research across multiple labs, publications/posters, Physics TA and Learning Assistant experience.",
   },
 ];
 
@@ -265,39 +266,52 @@ export default function Portfolio() {
         }
         .photo-ring-outer {
           position: absolute;
-          width: 260px;
-          height: 260px;
+          width: 280px;
+          height: 280px;
           border-radius: 50%;
-          border: 1px dashed rgba(201,169,110,0.3);
+          border: 2px dashed rgba(201,169,110,0.5);
           animation: spin-slow 25s linear infinite;
         }
         .photo-ring-inner {
           position: absolute;
-          width: 235px;
-          height: 235px;
+          width: 250px;
+          height: 250px;
           border-radius: 50%;
-          border: 1px solid rgba(201,169,110,0.15);
+          border: 2px solid rgba(201,169,110,0.35);
           animation: spin-reverse 20s linear infinite;
         }
         .photo-glow {
           position: absolute;
-          width: 220px;
-          height: 220px;
+          width: 300px;
+          height: 300px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(201,169,110,0.12) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(201,169,110,0.25) 0%, rgba(201,169,110,0.08) 50%, transparent 70%);
           animation: pulse-glow 4s ease-in-out infinite;
+        }
+        .photo-glow-secondary {
+          position: absolute;
+          width: 340px;
+          height: 340px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(201,169,110,0.1) 0%, transparent 60%);
+          animation: pulse-glow 5s ease-in-out 1s infinite;
         }
         .photo-dot {
           position: absolute;
-          width: 6px;
-          height: 6px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
-          background: rgba(201,169,110,0.6);
+          background: rgba(201,169,110,0.8);
+          box-shadow: 0 0 8px rgba(201,169,110,0.6);
         }
-        .photo-dot-1 { top: 10px; left: 50%; animation: pulse-glow 3s ease-in-out infinite; }
-        .photo-dot-2 { bottom: 10px; left: 50%; animation: pulse-glow 3s ease-in-out 1s infinite; }
-        .photo-dot-3 { left: 10px; top: 50%; animation: pulse-glow 3s ease-in-out 0.5s infinite; }
-        .photo-dot-4 { right: 10px; top: 50%; animation: pulse-glow 3s ease-in-out 1.5s infinite; }
+        .photo-dot-1 { top: 5px; left: 50%; animation: pulse-glow 3s ease-in-out infinite; }
+        .photo-dot-2 { bottom: 5px; left: 50%; animation: pulse-glow 3s ease-in-out 1s infinite; }
+        .photo-dot-3 { left: 5px; top: 50%; animation: pulse-glow 3s ease-in-out 0.5s infinite; }
+        .photo-dot-4 { right: 5px; top: 50%; animation: pulse-glow 3s ease-in-out 1.5s infinite; }
+        .photo-dot-5 { top: 30px; left: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 0.3s infinite; }
+        .photo-dot-6 { top: 30px; right: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 1.3s infinite; }
+        .photo-dot-7 { bottom: 30px; left: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 0.8s infinite; }
+        .photo-dot-8 { bottom: 30px; right: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 1.8s infinite; }
 
         .photo-container {
           animation: float 6s ease-in-out infinite;
@@ -423,7 +437,8 @@ export default function Portfolio() {
 
             {/* Profile photo with animated effects */}
             <div className="photo-container">
-              <div className="photo-wrapper" style={{ width: 270, height: 270 }}>
+              <div className="photo-wrapper" style={{ width: 340, height: 340 }}>
+                <div className="photo-glow-secondary" />
                 <div className="photo-ring-outer" />
                 <div className="photo-ring-inner" />
                 <div className="photo-glow" />
@@ -431,9 +446,14 @@ export default function Portfolio() {
                 <div className="photo-dot photo-dot-2" />
                 <div className="photo-dot photo-dot-3" />
                 <div className="photo-dot photo-dot-4" />
-                <img src="/profile-photo.jpg" alt="Aditya Raman" style={{
+                <div className="photo-dot photo-dot-5" />
+                <div className="photo-dot photo-dot-6" />
+                <div className="photo-dot photo-dot-7" />
+                <div className="photo-dot photo-dot-8" />
+                <img src="./profile-photo.jpg" alt="Aditya Raman" style={{
                   width: 200, height: 200, borderRadius: "50%",
-                  border: `2px solid ${colors.border}`,
+                  border: `3px solid rgba(201,169,110,0.4)`,
+                  boxShadow: "0 0 30px rgba(201,169,110,0.15), 0 0 60px rgba(201,169,110,0.05)",
                   objectFit: "cover",
                   position: "relative",
                   zIndex: 2,
@@ -556,6 +576,43 @@ export default function Portfolio() {
         <section id="skills" style={sectionStyle()}>
           <div style={containerStyle}>
             <h2 style={sectionHeading}>Skills</h2>
+
+            {/* Tools & Frameworks */}
+            <h3 style={{
+              fontSize: 16, fontWeight: 600, color: colors.textSecondary,
+              marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em",
+            }}>
+              Tools & Frameworks
+            </h3>
+            <div style={{
+              display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 40,
+            }}>
+              {TOOLS_AND_FRAMEWORKS.map((tool) => (
+                <span
+                  key={tool}
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontWeight: 500,
+                    padding: "8px 18px",
+                    borderRadius: 6,
+                    background: "rgba(201,169,110,0.1)",
+                    color: colors.accent,
+                    border: `1px solid rgba(201,169,110,0.25)`,
+                  }}
+                >
+                  {tool}
+                </span>
+              ))}
+            </div>
+
+            {/* Domain Skills */}
+            <h3 style={{
+              fontSize: 16, fontWeight: 600, color: colors.textSecondary,
+              marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em",
+            }}>
+              Domain Knowledge
+            </h3>
             <div
               className="skills-grid"
               style={{
@@ -564,7 +621,7 @@ export default function Portfolio() {
                 gap: 16,
               }}
             >
-              {SKILLS.map((skill, idx) => (
+              {DOMAIN_SKILLS.map((skill, idx) => (
                 <div
                   key={idx}
                   style={{
@@ -685,28 +742,54 @@ export default function Portfolio() {
         <section id="resume" style={sectionStyle(true)}>
           <div style={containerStyle}>
             <h2 style={sectionHeading}>Resume</h2>
-            <p style={{
-              fontSize: 16, color: colors.textSecondary,
-              lineHeight: 1.8, marginBottom: 24, maxWidth: 500,
+            <div style={{
+              borderRadius: 10,
+              border: `1px solid ${colors.border}`,
+              overflow: "hidden",
+              background: colors.bgCard,
             }}>
-              Download my full resume for a detailed look at my experience, education, and skills.
-            </p>
-            <a
-              href="/resume.pdf"
-              download
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "12px 28px", borderRadius: 6,
-                background: colors.accent, color: "#1a1a2e",
-                fontWeight: 600, fontSize: 14, cursor: "pointer",
-                textDecoration: "none",
-                transition: "background 0.2s",
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = colors.accentHover; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = colors.accent; }}
-            >
-              ↓ Download Resume (PDF)
-            </a>
+              <div style={{
+                padding: "12px 20px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                borderBottom: `1px solid ${colors.border}`,
+                background: "rgba(201,169,110,0.05)",
+              }}>
+                <span style={{
+                  fontSize: 14, fontWeight: 500, color: colors.textSecondary,
+                }}>
+                  Aditya_Raman_Resume.pdf
+                </span>
+                <a
+                  href="./resume.pdf"
+                  download
+                  style={{
+                    fontSize: 13, fontWeight: 500, color: colors.accent,
+                    textDecoration: "none",
+                    padding: "6px 14px",
+                    borderRadius: 5,
+                    border: `1px solid rgba(201,169,110,0.3)`,
+                    transition: "background 0.2s",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(201,169,110,0.1)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
+                  ↓ Download
+                </a>
+              </div>
+              <iframe
+                src="./resume.pdf"
+                title="Resume"
+                style={{
+                  width: "100%",
+                  height: 600,
+                  border: "none",
+                  display: "block",
+                  background: "#fff",
+                }}
+              />
+            </div>
           </div>
         </section>
 
