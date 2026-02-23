@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /* ══════════════════════════════════════════════════════════════
    DATA
@@ -169,6 +169,12 @@ export default function Portfolio() {
   const [expandedExp, setExpandedExp] = useState(new Set([0]));
   const [cubeHeld, setCubeHeld] = useState(false);
 
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const timeRef = useRef(0);
+  const waveRef = useRef([]);
+  const heldRef = useRef(false);
+
   const toggleExp = (idx) => {
     setExpandedExp(prev => {
       const next = new Set(prev);
@@ -176,6 +182,10 @@ export default function Portfolio() {
       return next;
     });
   };
+
+  useEffect(() => {
+    heldRef.current = cubeHeld;
+  }, [cubeHeld]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -191,6 +201,117 @@ export default function Portfolio() {
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = 320;
+    const H = 200;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+
+    const N = 5;
+    const baseR = 40;
+    const CX = 82;
+    const CY = H / 2;
+    const waveX0 = CX + 88;
+    const maxPts = 120;
+    const sp = 1.15;
+    const speed = 0.03;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      let x = CX, y = CY;
+
+      for (let n = 0; n < N; n++) {
+        const k = 2 * n + 1;
+        const r = baseR / k;
+        const a = k * timeRef.current;
+
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
+        ctx.strokeStyle = n === 0 ? "rgba(201,169,110,0.35)" : "rgba(201,169,110,0.2)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const nx = x + r * Math.cos(a);
+        const ny = y + r * Math.sin(a);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(nx, ny);
+        ctx.strokeStyle = n === 0 ? "rgba(201,169,110,0.65)" : "rgba(201,169,110,0.4)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (n < N - 1) {
+          ctx.beginPath();
+          ctx.arc(nx, ny, 1.5, 0, 2 * Math.PI);
+          ctx.fillStyle = "rgba(201,169,110,0.5)";
+          ctx.fill();
+        }
+
+        x = nx;
+        y = ny;
+      }
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(201,169,110,1)";
+      ctx.shadowColor = "rgba(201,169,110,0.8)";
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.restore();
+
+      if (heldRef.current) {
+        timeRef.current += speed;
+        waveRef.current.unshift(y);
+        if (waveRef.current.length > maxPts) waveRef.current.pop();
+      }
+
+      if (waveRef.current.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(waveX0, waveRef.current[0]);
+        ctx.strokeStyle = "rgba(201,169,110,0.25)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      if (waveRef.current.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(waveX0, waveRef.current[0]);
+        for (let i = 1; i < waveRef.current.length; i++) {
+          ctx.lineTo(waveX0 + i * sp, waveRef.current[i]);
+        }
+        ctx.strokeStyle = "rgba(201,169,110,0.85)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(waveX0, waveRef.current[0], 2.5, 0, 2 * Math.PI);
+        ctx.fillStyle = "rgba(201,169,110,0.9)";
+        ctx.shadowColor = "rgba(201,169,110,0.6)";
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      animRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => { if (animRef.current) cancelAnimationFrame(animRef.current); };
   }, []);
 
   const scrollTo = (id) => {
@@ -250,24 +371,12 @@ export default function Portfolio() {
         ::selection { background: rgba(201,169,110,0.25); color: #e8e4df; }
         a { color: inherit; text-decoration: none; }
 
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.05); }
-        }
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-8px); }
         }
-        @keyframes cube-rotate {
-          from { transform: rotateX(22deg) rotateY(0deg); }
-          to   { transform: rotateX(22deg) rotateY(360deg); }
-        }
 
-        .cube-container {
+        .fourier-container {
           animation: float 6s ease-in-out infinite;
           flex-shrink: 0;
         }
@@ -279,7 +388,7 @@ export default function Portfolio() {
           .nav-links { display: none !important; }
           .hero-layout { flex-direction: column-reverse !important; text-align: center !important; }
           .hero-links { justify-content: center !important; }
-          .cube-container { margin-bottom: 16px; }
+          .fourier-container { margin-bottom: 16px; }
           .category-tabs { flex-wrap: wrap !important; }
         }
         @media (max-width: 480px) {
@@ -390,8 +499,8 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Interactive 3D Cube */}
-            <div className="cube-container">
+            {/* Fourier Series Visualization */}
+            <div className="fourier-container">
               <div
                 onMouseDown={() => setCubeHeld(true)}
                 onMouseUp={() => setCubeHeld(false)}
@@ -400,102 +509,18 @@ export default function Portfolio() {
                 onTouchEnd={() => setCubeHeld(false)}
                 style={{
                   position: "relative",
-                  width: 240, height: 240,
-                  display: "flex", alignItems: "center", justifyContent: "center",
                   cursor: cubeHeld ? "grabbing" : "grab",
                   userSelect: "none", WebkitUserSelect: "none",
                 }}
               >
-                {/* Ambient glow */}
-                <div style={{
-                  position: "absolute",
-                  width: 190, height: 190,
-                  borderRadius: "50%",
-                  background: "radial-gradient(circle, rgba(201,169,110,0.18) 0%, transparent 70%)",
-                  animation: "pulse-glow 4s ease-in-out infinite",
-                  transition: "opacity 0.4s",
-                  opacity: cubeHeld ? 0.2 : 1,
-                  pointerEvents: "none",
-                }} />
-
-                {/* 3D Cube */}
-                <div style={{ perspective: 520, position: "absolute" }}>
-                  <div style={{
-                    width: 80, height: 80,
-                    position: "relative",
-                    transformStyle: "preserve-3d",
-                    animation: "cube-rotate 9s linear infinite",
-                    transition: "opacity 0.3s ease",
-                    opacity: cubeHeld ? 0 : 1,
-                  }}>
-                    {[
-                      { transform: "translateZ(40px)" },
-                      { transform: "rotateY(180deg) translateZ(40px)" },
-                      { transform: "rotateY(-90deg) translateZ(40px)" },
-                      { transform: "rotateY(90deg) translateZ(40px)" },
-                      { transform: "rotateX(90deg) translateZ(40px)" },
-                      { transform: "rotateX(-90deg) translateZ(40px)" },
-                    ].map((face, i) => (
-                      <div key={i} style={{
-                        position: "absolute",
-                        width: 80, height: 80,
-                        background: "rgba(201,169,110,0.07)",
-                        border: "1.5px solid rgba(201,169,110,0.6)",
-                        backfaceVisibility: "hidden",
-                        ...face,
-                      }} />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Particle orbit system */}
-                <div style={{
-                  position: "absolute",
-                  width: 0, height: 0,
-                  left: "50%", top: "50%",
-                  animation: "spin-slow 3.5s linear infinite",
-                  animationPlayState: cubeHeld ? "running" : "paused",
-                  pointerEvents: "none",
-                }}>
-                  {Array.from({ length: 16 }).map((_, i) => {
-                    const angle = (i / 16) * 360;
-                    const isLarge = i % 4 === 0;
-                    const size = isLarge ? 8 : 5;
-                    return (
-                      <div key={i} style={{
-                        position: "absolute",
-                        width: 0, height: 0,
-                        transform: `rotate(${angle}deg)`,
-                      }}>
-                        <div style={{
-                          position: "absolute",
-                          width: size, height: size,
-                          borderRadius: "50%",
-                          background: isLarge ? "rgba(201,169,110,0.95)" : "rgba(201,169,110,0.65)",
-                          boxShadow: isLarge ? "0 0 10px rgba(201,169,110,0.7)" : "0 0 5px rgba(201,169,110,0.4)",
-                          marginLeft: -(size / 2),
-                          marginTop: -(size / 2),
-                          transition: "transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease",
-                          transform: cubeHeld ? "translateX(95px)" : "translateX(0px)",
-                          opacity: cubeHeld ? 1 : 0,
-                        }} />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Hold hint */}
+                <canvas ref={canvasRef} style={{ display: "block" }} />
                 <p style={{
-                  position: "absolute",
-                  bottom: -28,
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  margin: 0,
+                  textAlign: "center",
+                  margin: "8px 0 0",
                   fontSize: 11,
                   color: "rgba(201,169,110,0.45)",
                   fontFamily: "'JetBrains Mono', monospace",
                   letterSpacing: "0.05em",
-                  whiteSpace: "nowrap",
                   userSelect: "none",
                   transition: "opacity 0.3s",
                   opacity: cubeHeld ? 0 : 1,
