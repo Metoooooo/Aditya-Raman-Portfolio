@@ -174,6 +174,8 @@ export default function Portfolio() {
   const timeRef = useRef(0);
   const waveRef = useRef([]);
   const heldRef = useRef(false);
+  const holdProgressRef = useRef(0);
+  const orbitAngleRef = useRef(0);
 
   const toggleExp = (idx) => {
     setExpandedExp(prev => {
@@ -227,6 +229,12 @@ export default function Portfolio() {
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
+
+      const target = heldRef.current ? 1 : 0;
+      holdProgressRef.current += (target - holdProgressRef.current) * 0.08;
+      if (holdProgressRef.current < 0.005) holdProgressRef.current = 0;
+      if (heldRef.current) orbitAngleRef.current += 0.02;
+
       let x = CX, y = CY;
 
       for (let n = 0; n < N; n++) {
@@ -305,6 +313,29 @@ export default function Portfolio() {
         ctx.shadowBlur = 8;
         ctx.fill();
         ctx.restore();
+      }
+
+      const prog = holdProgressRef.current;
+      if (prog > 0.01) {
+        const nPart = 16;
+        const oR = 75;
+        for (let i = 0; i < nPart; i++) {
+          const pa = (i / nPart) * 2 * Math.PI + orbitAngleRef.current;
+          const px = CX + Math.cos(pa) * oR * prog;
+          const py = CY + Math.sin(pa) * oR * prog;
+          const big = i % 4 === 0;
+          const sz = big ? 4 : 2.5;
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(px, py, sz, 0, 2 * Math.PI);
+          ctx.fillStyle = `rgba(201,169,110,${(prog * (big ? 0.95 : 0.6)).toFixed(2)})`;
+          if (big) {
+            ctx.shadowColor = `rgba(201,169,110,${(prog * 0.6).toFixed(2)})`;
+            ctx.shadowBlur = 8;
+          }
+          ctx.fill();
+          ctx.restore();
+        }
       }
 
       animRef.current = requestAnimationFrame(draw);
