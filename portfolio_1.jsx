@@ -167,6 +167,7 @@ export default function Portfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState("engineering");
   const [expandedExp, setExpandedExp] = useState(new Set([0]));
+  const [cubeHeld, setCubeHeld] = useState(false);
 
   const toggleExp = (idx) => {
     setExpandedExp(prev => {
@@ -253,10 +254,6 @@ export default function Portfolio() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes spin-reverse {
-          from { transform: rotate(360deg); }
-          to { transform: rotate(0deg); }
-        }
         @keyframes pulse-glow {
           0%, 100% { opacity: 0.4; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.05); }
@@ -265,65 +262,14 @@ export default function Portfolio() {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-8px); }
         }
+        @keyframes cube-rotate {
+          from { transform: rotateX(22deg) rotateY(0deg); }
+          to   { transform: rotateX(22deg) rotateY(360deg); }
+        }
 
-        .photo-wrapper {
-          position: relative;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
-        }
-        .photo-ring-outer {
-          position: absolute;
-          width: 280px;
-          height: 280px;
-          border-radius: 50%;
-          border: 2px dashed rgba(201,169,110,0.5);
-          animation: spin-slow 25s linear infinite;
-        }
-        .photo-ring-inner {
-          position: absolute;
-          width: 250px;
-          height: 250px;
-          border-radius: 50%;
-          border: 2px solid rgba(201,169,110,0.35);
-          animation: spin-reverse 20s linear infinite;
-        }
-        .photo-glow {
-          position: absolute;
-          width: 300px;
-          height: 300px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(201,169,110,0.25) 0%, rgba(201,169,110,0.08) 50%, transparent 70%);
-          animation: pulse-glow 4s ease-in-out infinite;
-        }
-        .photo-glow-secondary {
-          position: absolute;
-          width: 340px;
-          height: 340px;
-          border-radius: 50%;
-          background: radial-gradient(circle, rgba(201,169,110,0.1) 0%, transparent 60%);
-          animation: pulse-glow 5s ease-in-out 1s infinite;
-        }
-        .photo-dot {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: rgba(201,169,110,0.8);
-          box-shadow: 0 0 8px rgba(201,169,110,0.6);
-        }
-        .photo-dot-1 { top: 5px; left: 50%; animation: pulse-glow 3s ease-in-out infinite; }
-        .photo-dot-2 { bottom: 5px; left: 50%; animation: pulse-glow 3s ease-in-out 1s infinite; }
-        .photo-dot-3 { left: 5px; top: 50%; animation: pulse-glow 3s ease-in-out 0.5s infinite; }
-        .photo-dot-4 { right: 5px; top: 50%; animation: pulse-glow 3s ease-in-out 1.5s infinite; }
-        .photo-dot-5 { top: 30px; left: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 0.3s infinite; }
-        .photo-dot-6 { top: 30px; right: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 1.3s infinite; }
-        .photo-dot-7 { bottom: 30px; left: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 0.8s infinite; }
-        .photo-dot-8 { bottom: 30px; right: 30px; width: 5px; height: 5px; animation: pulse-glow 3.5s ease-in-out 1.8s infinite; }
-
-        .photo-container {
+        .cube-container {
           animation: float 6s ease-in-out infinite;
+          flex-shrink: 0;
         }
 
         @media (max-width: 640px) {
@@ -333,7 +279,7 @@ export default function Portfolio() {
           .nav-links { display: none !important; }
           .hero-layout { flex-direction: column-reverse !important; text-align: center !important; }
           .hero-links { justify-content: center !important; }
-          .photo-wrapper { margin-bottom: 16px; }
+          .cube-container { margin-bottom: 16px; }
           .category-tabs { flex-wrap: wrap !important; }
         }
         @media (max-width: 480px) {
@@ -444,29 +390,118 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Profile photo with animated effects */}
-            <div className="photo-container">
-              <div className="photo-wrapper" style={{ width: 340, height: 340 }}>
-                <div className="photo-glow-secondary" />
-                <div className="photo-ring-outer" />
-                <div className="photo-ring-inner" />
-                <div className="photo-glow" />
-                <div className="photo-dot photo-dot-1" />
-                <div className="photo-dot photo-dot-2" />
-                <div className="photo-dot photo-dot-3" />
-                <div className="photo-dot photo-dot-4" />
-                <div className="photo-dot photo-dot-5" />
-                <div className="photo-dot photo-dot-6" />
-                <div className="photo-dot photo-dot-7" />
-                <div className="photo-dot photo-dot-8" />
-                <img src="./profile-photo.jpg" alt="Aditya Raman" style={{
-                  width: 200, height: 200, borderRadius: "50%",
-                  border: `3px solid rgba(201,169,110,0.4)`,
-                  boxShadow: "0 0 30px rgba(201,169,110,0.15), 0 0 60px rgba(201,169,110,0.05)",
-                  objectFit: "cover",
+            {/* Interactive 3D Cube */}
+            <div className="cube-container">
+              <div
+                onMouseDown={() => setCubeHeld(true)}
+                onMouseUp={() => setCubeHeld(false)}
+                onMouseLeave={() => setCubeHeld(false)}
+                onTouchStart={(e) => { e.preventDefault(); setCubeHeld(true); }}
+                onTouchEnd={() => setCubeHeld(false)}
+                style={{
                   position: "relative",
-                  zIndex: 2,
+                  width: 240, height: 240,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  cursor: cubeHeld ? "grabbing" : "grab",
+                  userSelect: "none", WebkitUserSelect: "none",
+                }}
+              >
+                {/* Ambient glow */}
+                <div style={{
+                  position: "absolute",
+                  width: 190, height: 190,
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle, rgba(201,169,110,0.18) 0%, transparent 70%)",
+                  animation: "pulse-glow 4s ease-in-out infinite",
+                  transition: "opacity 0.4s",
+                  opacity: cubeHeld ? 0.2 : 1,
+                  pointerEvents: "none",
                 }} />
+
+                {/* 3D Cube */}
+                <div style={{ perspective: 520, position: "absolute" }}>
+                  <div style={{
+                    width: 80, height: 80,
+                    position: "relative",
+                    transformStyle: "preserve-3d",
+                    animation: "cube-rotate 9s linear infinite",
+                    transition: "opacity 0.3s ease",
+                    opacity: cubeHeld ? 0 : 1,
+                  }}>
+                    {[
+                      { transform: "translateZ(40px)" },
+                      { transform: "rotateY(180deg) translateZ(40px)" },
+                      { transform: "rotateY(-90deg) translateZ(40px)" },
+                      { transform: "rotateY(90deg) translateZ(40px)" },
+                      { transform: "rotateX(90deg) translateZ(40px)" },
+                      { transform: "rotateX(-90deg) translateZ(40px)" },
+                    ].map((face, i) => (
+                      <div key={i} style={{
+                        position: "absolute",
+                        width: 80, height: 80,
+                        background: "rgba(201,169,110,0.07)",
+                        border: "1.5px solid rgba(201,169,110,0.6)",
+                        backfaceVisibility: "hidden",
+                        ...face,
+                      }} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Particle orbit system */}
+                <div style={{
+                  position: "absolute",
+                  width: 0, height: 0,
+                  left: "50%", top: "50%",
+                  animation: "spin-slow 3.5s linear infinite",
+                  animationPlayState: cubeHeld ? "running" : "paused",
+                  pointerEvents: "none",
+                }}>
+                  {Array.from({ length: 16 }).map((_, i) => {
+                    const angle = (i / 16) * 360;
+                    const isLarge = i % 4 === 0;
+                    const size = isLarge ? 8 : 5;
+                    return (
+                      <div key={i} style={{
+                        position: "absolute",
+                        width: 0, height: 0,
+                        transform: `rotate(${angle}deg)`,
+                      }}>
+                        <div style={{
+                          position: "absolute",
+                          width: size, height: size,
+                          borderRadius: "50%",
+                          background: isLarge ? "rgba(201,169,110,0.95)" : "rgba(201,169,110,0.65)",
+                          boxShadow: isLarge ? "0 0 10px rgba(201,169,110,0.7)" : "0 0 5px rgba(201,169,110,0.4)",
+                          marginLeft: -(size / 2),
+                          marginTop: -(size / 2),
+                          transition: "transform 0.45s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.3s ease",
+                          transform: cubeHeld ? "translateX(95px)" : "translateX(0px)",
+                          opacity: cubeHeld ? 1 : 0,
+                        }} />
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Hold hint */}
+                <p style={{
+                  position: "absolute",
+                  bottom: -28,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  margin: 0,
+                  fontSize: 11,
+                  color: "rgba(201,169,110,0.45)",
+                  fontFamily: "'JetBrains Mono', monospace",
+                  letterSpacing: "0.05em",
+                  whiteSpace: "nowrap",
+                  userSelect: "none",
+                  transition: "opacity 0.3s",
+                  opacity: cubeHeld ? 0 : 1,
+                }}>
+                  hold to interact
+                </p>
               </div>
             </div>
           </div>
@@ -690,36 +725,19 @@ export default function Portfolio() {
                         textAlign: "left",
                         display: "flex",
                         justifyContent: "space-between",
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         gap: 16,
                         fontFamily: "'Inter', sans-serif",
                       }}
                     >
+                      {/* Left: role + company */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "baseline",
-                          flexWrap: "wrap",
-                          gap: 8,
-                          marginBottom: 4,
-                        }}>
+                        <div style={{ marginBottom: 4 }}>
                           <span style={{
                             fontSize: 17, fontWeight: 600, color: colors.text,
                           }}>
                             {exp.role}
                           </span>
-                          {exp.period && (
-                            <span style={{
-                              fontSize: 13,
-                              fontFamily: "'JetBrains Mono', monospace",
-                              color: colors.textTertiary,
-                              fontWeight: 400,
-                              flexShrink: 0,
-                            }}>
-                              {exp.period}
-                            </span>
-                          )}
                         </div>
                         <span style={{
                           fontSize: 14, fontWeight: 500, color: colors.accent,
@@ -727,17 +745,33 @@ export default function Portfolio() {
                           {exp.company}
                         </span>
                       </div>
-                      <span style={{
-                        fontSize: 18,
-                        color: colors.accent,
-                        flexShrink: 0,
-                        transition: "transform 0.25s",
-                        transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                        display: "inline-block",
-                        lineHeight: 1,
+                      {/* Right: date + chevron, always inline at top */}
+                      <div style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        flexShrink: 0, paddingTop: 2,
                       }}>
-                        ›
-                      </span>
+                        {exp.period && (
+                          <span style={{
+                            fontSize: 13,
+                            fontFamily: "'JetBrains Mono', monospace",
+                            color: colors.textTertiary,
+                            fontWeight: 400,
+                          }}>
+                            {exp.period}
+                          </span>
+                        )}
+                        <span style={{
+                          fontSize: 14,
+                          color: colors.accent,
+                          flexShrink: 0,
+                          transition: "transform 0.25s",
+                          transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                          display: "inline-block",
+                          lineHeight: 1,
+                        }}>
+                          ▾
+                        </span>
+                      </div>
                     </button>
                     <div style={{
                       overflow: "hidden",
@@ -810,7 +844,8 @@ export default function Portfolio() {
                 </span>
                 <a
                   href="./resume.pdf"
-                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     fontSize: 13, fontWeight: 500, color: colors.accent,
                     textDecoration: "none",
@@ -822,7 +857,7 @@ export default function Portfolio() {
                   onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(201,169,110,0.1)"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
                 >
-                  ↓ Download
+                  ↗ Open in new tab
                 </a>
               </div>
               <iframe
